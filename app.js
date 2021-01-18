@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const Blog = require('./models/blog');
 
 //connect to mongoDB
 const dbURI =
@@ -32,17 +33,23 @@ app.use((req, res, next) => {
 */
 
 app.use(express.static('public'));
-
 app.use(morgan('tiny'));
 
 //routes
 app.get('/', (req, res) => {
-  const blogs = [
-    { title: 'Yoyoy blog', snippet: 'Lorem ipsum leiras' },
-    { title: 'Yoyoy blog', snippet: 'Lorem ipsum leiras' },
-    { title: 'Yoyoy blog', snippet: 'Lorem ipsum leiras' },
-  ];
-  res.render('index', { title: 'Home', blogs });
+  Blog.find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      const blogs = result;
+      res.render('index', { title: 'Home', blogs });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+app.get('/blogs', (req, res) => {
+  res.redirect('/');
 });
 
 app.get('/about', (req, res) => {
