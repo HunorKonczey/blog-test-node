@@ -1,7 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-const Blog = require('./models/blog');
+const blogRoutes = require('./routes/blogRoutes');
 
 //connect to mongoDB
 const dbURI =
@@ -33,32 +33,23 @@ app.use((req, res, next) => {
 */
 
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('tiny'));
+app.use((req, res, next) => {
+  res.locals.path = req.path;
+  next();
+});
 
 //routes
 app.get('/', (req, res) => {
-  Blog.find()
-    .sort({ createdAt: -1 })
-    .then((result) => {
-      const blogs = result;
-      res.render('index', { title: 'Home', blogs });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
-app.get('/blogs', (req, res) => {
-  res.redirect('/');
+  res.redirect('/blogs');
 });
 
 app.get('/about', (req, res) => {
   res.render('about', { title: 'About' });
 });
 
-app.get('/blogs/create', (req, res) => {
-  res.render('create', { title: 'Create blog' });
-});
+app.use('/blogs', blogRoutes);
 
 //redirects
 
