@@ -2,13 +2,18 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const blogRoutes = require('./routes/blogRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 //connect to mongoDB
 const dbURI =
   'mongodb+srv://hunika:4OHTZXUSpQaKZUBx@cluster0.joeeq.mongodb.net/node-test?retryWrites=true&w=majority';
 
 mongoose
-  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(dbURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  })
   .then((result) => {
     app.listen(3000);
   })
@@ -49,6 +54,7 @@ app.get('/about', (req, res) => {
   res.render('about', { title: 'About' });
 });
 
+app.use(authRoutes);
 app.use('/blogs', blogRoutes);
 
 //redirects
