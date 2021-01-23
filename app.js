@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const blogRoutes = require('./routes/blogRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
+const { checkUser } = require('./middleware/authMiddleware');
 
 //connect to mongoDB
 const dbURI =
@@ -49,6 +50,7 @@ app.use((req, res, next) => {
 });
 
 //routes
+app.get('*', checkUser);
 app.get('/', (req, res) => {
   res.redirect('/blogs');
 });
@@ -69,9 +71,4 @@ app.get('/set-cookies', (req, res) => {
 app.get('/get-cookies', (req, res) => {
   const cookies = req.cookies;
   console.log(cookies);
-});
-
-//404 page
-app.use((req, res) => {
-  res.status(404).render('404', { title: 'Not found' });
 });
