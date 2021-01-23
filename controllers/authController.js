@@ -44,7 +44,10 @@ const login_get = (req, res) => {
   res.render('auth/login', { title: 'Login' });
 };
 
-const logout_get = (req, res) => {};
+const logout_get = (req, res) => {
+  res.cookie('jwt', '', { maxAge: 1 });
+  res.redirect('/');
+};
 
 const signup_post = async (req, res) => {
   const { email, password } = req.body;
