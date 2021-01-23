@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const blogRoutes = require('./routes/blogRoutes');
 const authRoutes = require('./routes/authRoutes');
+const cookieParser = require('cookie-parser');
 
 //connect to mongoDB
 const dbURI =
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(morgan('tiny'));
 app.use((req, res, next) => {
   res.locals.path = req.path;
@@ -58,7 +60,16 @@ app.get('/about', (req, res) => {
 app.use(authRoutes);
 app.use('/blogs', blogRoutes);
 
-//redirects
+//cookies
+app.get('/set-cookies', (req, res) => {
+  res.cookie('isEnabled', true), { maxAge: 1000 * 60 * 60 * 24 };
+  res.send('you got cookies');
+});
+
+app.get('/get-cookies', (req, res) => {
+  const cookies = req.cookies;
+  console.log(cookies);
+});
 
 //404 page
 app.use((req, res) => {
