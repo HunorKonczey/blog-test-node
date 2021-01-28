@@ -5,6 +5,7 @@ const blogRoutes = require('./routes/blogRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const { checkUser } = require('./middleware/authMiddleware');
+var session = require('express-session');
 
 //connect to mongoDB
 const dbURI =
@@ -42,6 +43,13 @@ app.use((req, res, next) => {
 app.use(express.static('public'));
 //app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  session({
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    secret: 'keyboard cat',
+  })
+);
 app.use(cookieParser());
 app.use(morgan('tiny'));
 app.use((req, res, next) => {

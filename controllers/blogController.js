@@ -1,5 +1,17 @@
 const Blog = require('../models/blog');
 
+const handleErrors = (err) => {
+  let errors = { title: '', snippet: '', body: '' };
+
+  if (err.message.includes('User validation failed')) {
+    Object.values(err.errors).forEach(({ properties }) => {
+      errors[properties.path] = properties.message;
+    });
+  }
+
+  return errors;
+};
+
 //blog: index, details, create_get, create_post, delete
 const blog_index = (req, res) => {
   Blog.find()
@@ -29,16 +41,20 @@ const blog_create_get = (req, res) => {
   res.render('blogs/create', { title: 'Create a new blog' });
 };
 
-const blog_create_post = (req, res) => {
-  const blog = new Blog(req.body);
-  blog
-    .save()
-    .then((result) => {
-      res.redirect('/');
-    })
-    .catch((err) => {
-      console.log(err);
+const blog_create_post = async (req, res) => {
+  try {
+    const { title, snippet, body } = req.body;
+    var blog = await Blog.create({
+      title: title,
+      snippet: snippet,
+      body: body,
+      userId: req.userId,
     });
+    res.status(201).json({ result });
+  } catch (err) {
+    const errors = handleErrors(err);
+    res.status(400).json({ errors });
+  }
 };
 
 const blog_delete = (req, res) => {
